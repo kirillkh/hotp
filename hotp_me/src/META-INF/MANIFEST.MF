@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+MIDlet-Data-Size: 40
+MicroEdition-Configuration: CLDC-1.0
+MIDlet-Name: HOTP Generator
+Created-By: 1.5.0_06-b05 (Sun Microsystems Inc.)
+Ant-Version: Apache Ant 1.6.5
+MIDlet-Vendor: freeutils.net (by A. Rothman)
+MIDlet-1: HOTP Generator, /hotp.png, otp.HOTPMidlet
+MIDlet-Version: 1.0.2
+MicroEdition-Profile: MIDP-1.0
+MIDlet-Description: HOTP generator mobile client

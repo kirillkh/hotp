@@ -1,0 +1,2 @@
+content	moodleotp	content/
+overlay	chrome://browser/content/browser.xul	chrome://moodleotp/content/script-compiler-overlay.xul

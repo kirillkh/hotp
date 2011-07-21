@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- You may freely edit this file. See commented blocks below for -->
+<!-- some examples of how to customize the build. -->
+<!-- (If you delete it and reopen the project it will be recreated.) -->
+<!-- By default, only the Clean and Build commands use this build script. -->
+<!-- Commands such as Run, Debug, and Test only use this build script if -->
+<!-- the Compile on Save feature is turned off for the project. -->
+<!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
+<!-- in the project's Project Properties dialog box.-->
+<project name="hotp" default="default" basedir=".">
+    <description>Builds, tests, and runs the project hotp.</description>
+    <import file="nbproject/build-impl.xml"/>
+    <!--
+
+    There exist several targets which are by default empty and which can be 
+    used for execution of your tasks. These targets are usually executed 
+    before and after some main targets. They are: 
+
+      -pre-init:                 called before initialization of project properties
+      -post-init:                called after initialization of project properties
+      -pre-compile:              called before javac compilation
+      -post-compile:             called after javac compilation
+      -pre-compile-single:       called before javac compilation of single file
+      -post-compile-single:      called after javac compilation of single file
+      -pre-compile-test:         called before javac compilation of JUnit tests
+      -post-compile-test:        called after javac compilation of JUnit tests
+      -pre-compile-test-single:  called before javac compilation of single JUnit test
+      -post-compile-test-single: called after javac compilation of single JUunit test
+      -pre-jar:                  called before JAR building
+      -post-jar:                 called after JAR building
+      -post-clean:               called after cleaning build products
+
+    (Targets beginning with '-' are not intended to be called on their own.)
+
+    Example of inserting an obfuscator after compilation could look like this:
+
+        <target name="-post-compile">
+            <obfuscate>
+                <fileset dir="${build.classes.dir}"/>
+            </obfuscate>
+        </target>
+
+    For list of available properties check the imported 
+    nbproject/build-impl.xml file. 
+
+
+    Another way to customize the build is by overriding existing main targets.
+    The targets of interest are: 
+
+      -init-macrodef-javac:     defines macro for javac compilation
+      -init-macrodef-junit:     defines macro for junit execution
+      -init-macrodef-debug:     defines macro for class debugging
+      -init-macrodef-java:      defines macro for class execution
+      -do-jar-with-manifest:    JAR building (if you are using a manifest)
+      -do-jar-without-manifest: JAR building (if you are not using a manifest)
+      run:                      execution of project 
+      -javadoc-build:           Javadoc generation
+      test-report:              JUnit report generation
+
+    An example of overriding the target for project execution could look like this:
+
+        <target name="run" depends="hotp-impl.jar">
+            <exec dir="bin" executable="launcher.exe">
+                <arg file="${dist.jar}"/>
+            </exec>
+        </target>
+
+    Notice that the overridden target depends on the jar target and not only on 
+    the compile target as the regular run target does. Again, for a list of available 
+    properties which you can use, check the target you are overriding in the
+    nbproject/build-impl.xml file. 
+
+    -->
+
+    <target name="-post-jar" depends="package"/>
+
+
+    <target name="package" depends="init,xpi">
+        <tempfile destdir="/tmp" property="tmp.tree"/>
+        <mkdir dir="${tmp.tree}"/>
+        <dirname property="git.repo.abs" file="${git.repo}/."/>
+
+        <exec dir="${tmp.tree}" failonerror="true" command="/bin/sh -c 'git clone ${git.repo.abs}'"/>
+
+        <move file="${tmp.tree}/cs/devel/hotp/web" todir="${tmp.tree}/cs/devel/"/>
+
+
+        <property name="hotp.src.filename" value="hotp-${hotp.version}.tar.bz2"/>
+        <property name="hotp.src.path" value="${basedir}/dist/${hotp.src.filename}"/>
+        <tar compression="bzip2" basedir="${tmp.tree}/cs/devel" includes="hotp/**"
+             destfile="${hotp.src.path}"/>
+
+        <property name="hotp.jar.filename" value="hotp-${hotp.version}.jar"/>
+        <copy overwrite="true" file="${dist.jar}" tofile="/var/www/wp-uploads/hotp/${hotp.jar.filename}"/>
+        <symlink overwrite="true" resource="/var/www/wp-uploads/hotp/${hotp.jar.filename}"
+                 link="/var/www/wp-uploads/hotp/hotp.jar"/>
+
+        <property name="moodleotp.src.filename" value="moodleotp-${web.ver}.tar.bz2"/>
+        <property name="moodleotp.src.path" value="${basedir}/dist/${moodleotp.src.filename}"/>
+        <tar compression="bzip2" basedir="${tmp.tree}/cs/devel" includes="web/**"
+             destfile="${moodleotp.src.path}"/>
+        <delete dir="${tmp.tree}"/>
+
+        <move overwrite="true" file="${hotp.src.path}" todir="/var/www/wp-uploads/hotp/"/>
+        <symlink overwrite="true" resource="/var/www/wp-uploads/hotp/${hotp.src.filename}"
+                 link="/var/www/wp-uploads/hotp/hotp.tar.bz2"/>
+
+        <move overwrite="true" file="${moodleotp.src.path}" todir="/var/www/wp-uploads/hotp/"/>
+        <symlink overwrite="true" resource="/var/www/wp-uploads/hotp/${moodleotp.src.filename}"
+                 link="/var/www/wp-uploads/hotp/moodleotp.tar.bz2"/>
+    </target>
+
+
+
+
+    <target name="xpi" depends="init,inc-xpi-ver,fetch-version,deploy-xpi,deploy-xpi-update"/>
+
+
+    <target name="deploy-xpi">
+        <zip destfile="${xpi_path}" basedir="web/ext" includes="**"/>
+        <move overwrite="true" file="${xpi_path}" todir="/var/www/wp-uploads/hotp/"/>
+        <symlink overwrite="true" resource="${target_xpi_path}"
+                 link="/var/www/wp-uploads/hotp/moodleotp.xpi"/>
+    </target>
+
+    <target name="deploy-xpi-update">
+        <!-- update version in the update RDF, sign it and move it to the uploads -->
+        <property name="up_rdf" value="moodleotp_update_templ.rdf"/>
+        <property name="ext.path" value=""/>
+        <exec 
+            dir="web/ext_build"
+            failonerror="true"
+            command="/bin/sh -c 'spock/spock ${up_rdf} -i ${ext_id} -d ${mccoy_dir} -v ${web.ver} -f ${target_xpi_path} > temp/out.xml'"/>
+        <move file="web/ext_build/temp/out.xml" tofile="${web.target.dir}/moodleotp_update.rdf"/>
+
+        <!-- clean up -->
+        <delete dir="web/ext_build/temp"/>
+    </target>
+
+
+
+    <target name="check-xpi-uptodate">
+        <!-- compare the date of install.rdf to the rest of the extension's source
+             files to determine, whether the build version should be incremented -->
+        <uptodate property="not_inc_xpi_ver" targetfile="web/ext/install.rdf">
+            <srcfiles dir="web/ext" includes="**"/>
+        </uptodate>
+
+        <condition property="inc_xpi_ver" value="true">
+            <not><istrue value="${not_inc_xpi_ver}"/></not>
+        </condition>
+    </target>
+
+    <target name="inc-xpi-ver" depends="check-xpi-uptodate" if="inc_xpi_ver">
+        <echo message="incrementing XPI build number"/>
+        
+        <xslt in="web/ext/install.rdf" out="web/ext_build/temp/_install.rdf" style="web/ext_build/inc_build_num.xsl">
+            <outputproperty name="indent" value="yes"/>
+        </xslt>
+
+        <move file="web/ext_build/temp/_install.rdf" tofile="web/ext/install.rdf"/>
+    </target>
+
+
+    <macrodef name="xslt" uri="stupid-xslt">
+        <attribute name="in" />
+        <attribute name="out" />
+        <attribute name="style" />
+        <attribute name="classpath" default="lib/xalan.jar" />
+        <attribute name="taskname" default="mydep:xslt" />
+        <element name="params" optional="true" implicit="true" />
+        <sequential>
+            <java classname="org.apache.xalan.xslt.Process" fork="true"
+                  classpath="@{classpath}"
+                  taskname="@{taskname}">
+                <classpath path="@{classpath}" />
+                <arg line="-in @{in}" />
+                <arg line="-xsl @{style}" />
+                <arg line="-out @{out}" />
+                <params />
+            </java>
+        </sequential>
+    </macrodef>
+    
+    <target name="fetch-version">
+        <!-- fetch the new build version from install.rdf -->
+        <mkdir dir="web/ext_build/temp"/>
+        <stupid-xslt:xslt in="web/ext/install.rdf" out="web/ext_build/temp/web.ver" style="web/ext_build/fetch_build_ver.xsl"
+                          xmlns:stupid-xslt="stupid-xslt"/>
+        <loadfile srcfile="web/ext_build/temp/web.ver" property="web.ver"/>
+        <echo message="current XPI version: ${web.ver}"/>
+        
+        <property name="xpi_path" value="web/ext_build/temp/moodleotp-${web.ver}.xpi"/>
+        <property name="target_xpi_path" value="/var/www/wp-uploads/hotp/moodleotp-${web.ver}.xpi"/>
+    </target>
+</project>

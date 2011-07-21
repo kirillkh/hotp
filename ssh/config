@@ -1,0 +1,2 @@
+Host huji
+ProxyCommand $HOME/.ssh/otp/init_ssh.sh

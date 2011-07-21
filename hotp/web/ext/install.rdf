@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+<Description about="urn:mozilla:install-manifest">
+	<em:id>{2b8375e6-0dba-4fdc-95d6-29a5a3d4b473}</em:id>
+	<em:name>moodleotp</em:name>
+	<em:version>0.2.3</em:version>
+	<em:updateURL>http://flice.mine.nu/wp-uploads/hotp/moodleotp_update.rdf</em:updateURL>
+	<em:description>Fills in the OTP password, that is required to log into the Moodle system.</em:description>
+	<em:creator>http://flice.mine.nu</em:creator>
+	<em:contributor>Greasemonkey Compiler by Anthony Lieuallen;</em:contributor>
+	<em:contributor>http://arantius.com/</em:contributor>
+	<em:homepageURL>http://flice.mine.nu/wordpress/?p=102</em:homepageURL>
+	<em:targetApplication>
+	  <Description>
+	     <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+	     <em:minVersion>2.0</em:minVersion>
+	     <em:maxVersion>3.5.*</em:maxVersion>
+	  </Description>
+	</em:targetApplication>
+    <em:updateKey>
+        MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDSwhZ0x8ztjVEAr+MoRUS42R45Q3+2uHA1
+        cERllUaLeJD/8NHxC9UFbYabfuGnb8t/ThVqIWuZvQyQDDnOYBcY5f4gKUgHmY9HqlNAQoFI
+        R3/uEuvugUlZLmBhk7xvEeDmnnoin/7Cl98d2mRW4a+BD2xMRqEFGDX0NCByhh+4cQIDAQAB
+    </em:updateKey>
+</Description>
+</RDF>

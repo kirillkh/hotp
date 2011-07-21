@@ -1,0 +1,27 @@
+#!/usr/bin/expect
+
+set user [lindex $argv 0]
+set host [lindex $argv 1]
+set local_port [lindex $argv 2]
+set hotp [lindex $argv 3]
+set log_cmd [lindex $argv 4]
+
+#spawn ssh -v -f -t -t $user%$host@gw.cs.huji.ac.il -L $local_port:$host:22 sleep 0
+#spawn sh -c "(ssh -v -f -t -t $user%$host@gw.cs.huji.ac.il -L $local_port:$host:22 sleep 0 3>&1 1>&2 2>&3 | tee -a $log) 3>&1 1>&2 2>&3"
+spawn sh -c "$log_cmd ssh -v -f -t -t $user%$host@gw.cs.huji.ac.il -L $local_port:$host:22 sleep 0"
+set ssh $spawn_id
+expect "(OTP) Password: " {
+  spawn java -jar $hotp make -i
+  expect -re "^(......)"
+  set otp $expect_out(1,string)
+  
+  set spawn_id $ssh
+  send "$otp\n"
+}
+
+#expect "Entering interactive session" {
+expect "forwarded to remote address" {
+  exit
+} "Last login:" {
+  exit
+}
