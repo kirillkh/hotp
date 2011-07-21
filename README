@@ -72,4 +72,4 @@ chmod 600 ~/.hotp.conf
 7.2. Log into a HUJI facility (web account or telnet/ssh) with the generated OTP.
 
 
-DISCLAIMER: don’t sue me, I only did this for fun!
+DISCLAIMER: to my knowledge, there is no obstacle for publishing or using this code, as the original app did not specify any distribution conditions.
