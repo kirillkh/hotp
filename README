@@ -73,3 +73,25 @@ chmod 600 ~/.hotp.conf
 
 
 DISCLAIMER: to my knowledge, there is no obstacle for publishing or using this code, as the original app did not specify any distribution conditions.
+
+
+--------------------------------------------------------------------------------------------------------
+SSH setup instructions:
+1. install program called 'expect'
+2. cd <hotp source tree>
+3. cp -r ssh/* ~/.ssh/ && chmod -R go-rwx ~/.ssh
+4. cp <path to hotp.jar> ~/.ssh/otp/
+5. customize variables in otp/init_ssh.sh
+
+Usage: ssh <USER>@huji
+
+
+--------------------------------------------------------------------------------------------------------
+SSHFS setup instructions:
+1. Add this line (without quotes, replace every <TAG> with its correct value) to /etc/fstab: "sshfs#<REMOTE_USER>@huji:/cs/stud/<REMOTE_USER> <MOUNT_POINT> fuse defaults,sshfs_debug,sshfs_debug,compression=yes,user,uid=<LOCAL_USER_ID>,gid=<LOCAL_GROUP_ID>,noauto,ssh_command=/home/<LOCAL_USER>/.ssh/otp/init_sshfs.sh 0 0"
+
+Usage: execute "mount <MOUNT_POINT>" as your own user (NOT as root)
+
+2. The above gives you access to your home directory. You can duplicate the above line, replacing "/cs/stud/<REMOTE_USER>" with other paths to gain access to other directories, such as:
+- /cs/+/stud/<REMOTE_USER> - your additional space
+- /                        - root filesystem
